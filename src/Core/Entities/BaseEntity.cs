@@ -10,12 +10,12 @@ namespace Core.Entities
     {
         public Guid Id { get; set; }
         public bool IsDeleted { get; set; }
-        public string? DeletedBy { get; protected set; } = string.Empty;
-        public virtual DateTime? Deleted { get; protected set; }
+        public string? DeletedBy { get; set; } = string.Empty;
+        public virtual DateTime? Deleted { get; set; }
         public string? CreatedBy { get; set; } = string.Empty;
         public virtual DateTime Created { get; set; }
-        public virtual DateTime? Modified { get; protected set; }
-        public virtual string? LastModifiedBy { get; protected set; }
+        public virtual DateTime? Modified { get; set; }
+        public virtual string? LastModifiedBy { get; set; }
         protected BaseEntity()
         {
             Id = Guid.NewGuid();

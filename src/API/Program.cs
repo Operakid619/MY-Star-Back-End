@@ -147,6 +147,7 @@ try
     builder.Services.AddTransient<IJobTitleService, JobTitleService>();
     builder.Services.AddTransient<IQrCodeService, QrCodeService>();
     builder.Services.AddTransient<ITripService, TripService>();
+    builder.Services.AddTransient<IBusDriverSevice, BusDriverSevice>();
 
 
 

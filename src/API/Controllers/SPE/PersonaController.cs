@@ -20,10 +20,12 @@ namespace API.Controllers.SPE
     public class PersonaController : BaseController
     {
         private readonly IPersonaService _personaService;
+        private readonly IBusDriverSevice _busDriverSevice;
 
-        public PersonaController(IPersonaService personaService)
+        public PersonaController(IPersonaService personaService, IBusDriverSevice busDriverSevice)
         {
             _personaService = personaService;
+            _busDriverSevice = busDriverSevice;
         }
 
 
@@ -437,6 +439,48 @@ namespace API.Controllers.SPE
         public async Task<ActionResult<BaseResponse>> DeleteUserByAdminAsync(Guid userId)
         {
             var response = await _personaService.DeleteUserByAdminAsync(userId);
+            return HandleResult(response);
+        }
+
+
+        [Authorize(Roles = AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        [SwaggerOperation(
+         Summary = "Update BusDriver Information Endpoint",
+         Description = "This endpoint updates a bus driver information. It requires Admin privilege",
+         OperationId = "BusDriver.update",
+         Tags = new[] { "PersonaEndpoints" })
+         ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPut("update-busdriver")]
+        public async Task<ActionResult<BaseResponse>> UpdateBusDriverAsync([FromBody] EditBusdriverRequest request)
+        {
+            var response = await _busDriverSevice.EditBusdriver(request);
+            return HandleResult(response);
+        }
+
+        [Authorize(Roles = AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        [SwaggerOperation(
+        Summary = "Delete A Bus Driver By Admin Endpoint",
+        Description = "This endpoint deletes a driver by admin account. It requires admin privelege",
+        OperationId = "busdriver.deleteByAdmin",
+        Tags = new[] { "PersonaEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpDelete("delete-busdriver")]
+        public async Task<ActionResult<BaseResponse>> DeleteBusdriverByAdminAsync(Guid busDriverId)
+        {
+            var response = await _busDriverSevice.DeleteBusdriver(busDriverId);
             return HandleResult(response);
         }
 

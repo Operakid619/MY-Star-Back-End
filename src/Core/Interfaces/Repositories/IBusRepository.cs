@@ -12,5 +12,6 @@ namespace Core.Interfaces.Repositories
     {
         public Task<BaseResponse> AddBus(Bus bus);
         public Task<IQueryable<Bus>> GetAllAsync();
+        public Task<Bus> GetBusAsync(Guid id);
     }
 }

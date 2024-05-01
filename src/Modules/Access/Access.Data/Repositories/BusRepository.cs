@@ -43,5 +43,10 @@ namespace Access.Data.Repositories
         {
             return _dbContext.Buses.AsQueryable().AsNoTracking();
         }
+
+        public async Task<Bus> GetBusAsync(Guid id)
+        {
+            return await _dbContext.Buses.FirstOrDefaultAsync(x => x.Id == id);
+        }
     }
 }

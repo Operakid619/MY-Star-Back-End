@@ -12,6 +12,6 @@ namespace Shared.Models.Requests
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
-        public Guid? BusId { get; set; }
+        //public Guid? BusId { get; set; }
     }
 }

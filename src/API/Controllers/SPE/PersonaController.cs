@@ -421,7 +421,7 @@ namespace API.Controllers.SPE
             return HandleResult(response);
         }
 
-        [AllowAnonymous]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
         Summary = "Delete A User By Admin Endpoint",
         Description = "This endpoint deletes a user by admin account. It requires admin privelege",
@@ -443,7 +443,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
          Summary = "Update BusDriver Information Endpoint",
          Description = "This endpoint updates a bus driver information. It requires Admin privilege",
@@ -457,13 +457,13 @@ namespace API.Controllers.SPE
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
         [HttpPut("update-busdriver")]
-        public async Task<ActionResult<BaseResponse>> UpdateBusDriverAsync([FromBody] EditBusdriverRequest request)
+        public async Task<ActionResult<BaseResponse>> EditBusDriverAsync([FromBody] EditBusdriverRequest request)
         {
             var response = await _busDriverSevice.EditBusdriver(request);
             return HandleResult(response);
         }
 
-        [Authorize(Roles = AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
         Summary = "Delete A Bus Driver By Admin Endpoint",
         Description = "This endpoint deletes a driver by admin account. It requires admin privelege",

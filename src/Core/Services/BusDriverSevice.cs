@@ -45,20 +45,20 @@ namespace Core.Services
             }
 
 
-            if (request.BusId is not null)
-            {
-                var bus = await _busRepository.GetBusAsync(request.BusId.Value);
-                if (bus is null)
-                {
-                    response.Status = false;
-                    response.Code = ResponseCodes.Status404NotFound;
-                    response.Message = "Bus not found with id";
-                    return response;
-                }
-            }
+            //if (request.BusId is not null)
+            //{
+            //    var bus = await _busRepository.GetBusAsync(request.BusId.Value);
+            //    if (bus is null)
+            //    {
+            //        response.Status = false;
+            //        response.Code = ResponseCodes.Status404NotFound;
+            //        response.Message = "Bus not found with id";
+            //        return response;
+            //    }
+            //}
 
 
-            busdriver.BusId = request.BusId ?? busdriver.BusId;
+            //busdriver.BusId = request.BusId ?? busdriver.BusId;
             busdriver.FirstName = request.FirstName ?? busdriver.FirstName;
             busdriver.LastName = request.LastName ?? busdriver.LastName;
             busdriver.PhoneNumber = request.PhoneNumber ?? busdriver.PhoneNumber;

@@ -631,13 +631,17 @@ namespace Core.Services
             var response = new ApiResponse<List<BusDriverResponse>>();
 
             var busdrivers = _dbContext.Busdrivers
+                .Include(x => x.Bus)
                 .Select(x => new BusDriverResponse()
                 {
                     BusDriverId = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     PhotoUrl = x.PhotoUrl,
-
+                    Email = x.Email,
+                    PhoneNumber = x.PhoneNumber,
+                    BusId = x.BusId.Value,
+                    BusNumber = x.Bus.Number,
                 })
                 .AsNoTracking();
 

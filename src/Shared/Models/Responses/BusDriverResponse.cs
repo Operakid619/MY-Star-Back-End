@@ -15,8 +15,9 @@ namespace Models.Responses
         public string LastName { get; init; } = string.Empty;
         public string PhotoUrl { get; set; } = string.Empty;
 
-        public string Role { get; set; } = string.Empty;
+        //public string Role { get; set; } = string.Empty;
         public string BusNumber { get; set; } = string.Empty;
+        public Guid BusId { get; set; }
 
     }
 

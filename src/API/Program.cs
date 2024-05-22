@@ -65,7 +65,7 @@ try
            .Enrich.FromLogContext()
            .WriteTo.Console()
            .WriteTo.File(
-                @"/logs/MyStarAppStaging/logs.txt",
+                @"/logs/MyStarAPIStaging/logs.txt",
                 fileSizeLimitBytes: 10485760,
                 rollOnFileSizeLimit: true,
                 shared: true,
@@ -83,7 +83,7 @@ try
            .Enrich.FromLogContext()
            .WriteTo.Console()
            .WriteTo.File(
-                @"/logs/MyStarAppProduction/logs.txt",
+                @"/logs/MyStarAPIProduction/logs.txt",
                 fileSizeLimitBytes: 10485760,
                 rollOnFileSizeLimit: true,
                 shared: true,

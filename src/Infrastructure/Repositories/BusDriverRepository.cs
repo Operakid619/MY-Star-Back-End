@@ -24,7 +24,7 @@ namespace Infrastructure.Repositories
         }
         public async Task<Busdriver?> GetBusdriverByEmail(string email)
         {
-            return await _dbContext.Busdrivers.FirstOrDefaultAsync(x => x.Email == email);
+            return await _dbContext.Busdrivers.Include(x => x.Bus).FirstOrDefaultAsync(x => x.Email == email);
         }
 
         public async Task<BaseResponse> EditBusdriver(Busdriver busdriver)
@@ -53,7 +53,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Busdriver?> GetBusdriverById(Guid id)
         {
-            return await _dbContext.Busdrivers.FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext.Busdrivers.Include(x => x.Bus).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<List<Busdriver>> GetAllBusdrivers()

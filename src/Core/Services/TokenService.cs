@@ -22,7 +22,8 @@ namespace Core.Services
                 new Claim(ClaimTypes.Email, persona.Email),
                 new Claim(ClaimTypes.Name, persona.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("fullName",persona.FirstName +" "+ persona.LastName)
+                new Claim("fullName",persona.FirstName +" "+ persona.LastName),
+                //new Claim("tenantKey",persona.TenantKey),
             };
 
             foreach (var role in persona.Roles)

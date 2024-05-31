@@ -178,7 +178,7 @@ namespace Infrastructure.Repositories
             return await _dbContext.QrCodes.FirstOrDefaultAsync(x => x.Id == id);
         }
         
-        public async Task<BaseResponse> QrCodeExist(Guid studentId, string parentEmail)
+        public async Task<BaseResponse> QrCodeExistForStudent(Guid studentId, string parentEmail)
         {
             var response = new BaseResponse();
 
@@ -198,5 +198,28 @@ namespace Infrastructure.Repositories
                 return response;
             }
         }
+
+
+        public async Task<BaseResponse> QrCodeExistForBusDriver(Guid busDriverId)
+        {
+            var response = new BaseResponse();
+
+            var qrCode = await _dbContext.QrCodes.FirstOrDefaultAsync(x => x.BusdriverId == busDriverId && x.Created.Date.ToUniversalTime() == DateTime.Today.ToUniversalTime());
+            if (qrCode != null)
+            {
+                response.Code = ResponseCodes.Status200OK;
+                response.Status = true;
+                response.Message = "Qr Code record exist";
+                return response;
+            }
+            else
+            {
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Status = false;
+                response.Message = "Qr Code record doesn't exist";
+                return response;
+            }
+        }
+
     }
 }

@@ -3,7 +3,6 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,11 +11,9 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240206005756_init")]
-    partial class init
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,6 +53,9 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<int>("NumberOfSeat")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -243,14 +243,17 @@ namespace Infrastructure.Migrations
                     b.Property<int>("AuthorizedUser")
                         .HasColumnType("integer");
 
-                    b.Property<string>("AuthorizedUserFirstName")
+                    b.Property<string>("AuthorizedUserFullName")
                         .HasColumnType("text");
 
-                    b.Property<string>("AuthorizedUserLastName")
+                    b.Property<string>("AuthorizedUserPhoneNumber")
                         .HasColumnType("text");
 
                     b.Property<string>("AuthorizedUserRelationship")
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("BusdriverId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -282,19 +285,177 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("PickUpTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("StudentId")
+                    b.Property<string>("ScannedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ScannedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("StudentId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BusdriverId");
 
                     b.HasIndex("IsDeleted");
 
                     b.HasIndex("StudentId");
 
                     b.ToTable("QrCodes");
+                });
+
+            modelBuilder.Entity("Core.Entities.Tenant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Modified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantAdminEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tenants");
+                });
+
+            modelBuilder.Entity("Core.Entities.Trip", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BusDriver")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FuelCousumption")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsReFuel")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastMaintenanceDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Modified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReasonForReFuel")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RouteFollowed")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("StartTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("TripType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.ToTable("Trips");
+                });
+
+            modelBuilder.Entity("Core.Entities.TripStudent", b =>
+                {
+                    b.Property<Guid>("TripId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EnrollmentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Modified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("TripId", "StudentId");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("TripStudents");
                 });
 
             modelBuilder.Entity("Core.Entities.Users.Busdriver", b =>
@@ -917,13 +1078,36 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.QrCode", b =>
                 {
+                    b.HasOne("Core.Entities.Users.Busdriver", "Busdriver")
+                        .WithMany()
+                        .HasForeignKey("BusdriverId");
+
                     b.HasOne("Core.Entities.Users.Student", "Student")
                         .WithMany()
+                        .HasForeignKey("StudentId");
+
+                    b.Navigation("Busdriver");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Core.Entities.TripStudent", b =>
+                {
+                    b.HasOne("Core.Entities.Users.Student", "Student")
+                        .WithMany("TripStudents")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Core.Entities.Trip", "Trip")
+                        .WithMany("TripStudents")
+                        .HasForeignKey("TripId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Student");
+
+                    b.Navigation("Trip");
                 });
 
             modelBuilder.Entity("Core.Entities.Users.Busdriver", b =>
@@ -1036,6 +1220,16 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Core.Entities.Campus", b =>
                 {
                     b.Navigation("Grades");
+                });
+
+            modelBuilder.Entity("Core.Entities.Trip", b =>
+                {
+                    b.Navigation("TripStudents");
+                });
+
+            modelBuilder.Entity("Core.Entities.Users.Student", b =>
+                {
+                    b.Navigation("TripStudents");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,7 +10,7 @@ namespace Core.Entities
         /// </summary>
         //public Guid UserId { get; set; }
         public string UserEmail { get; set; }
-        public Guid StudentId { get; set; }
+        public Guid? StudentId { get; set; }
         public Student? Student { get; set; }
         public bool InSchool { get; set; } = true;
         public DateTime PickUpTime { get; set; }
@@ -22,5 +22,8 @@ namespace Core.Entities
 
         public string? ScannedBy { get; set; }
         public DateTime? ScannedTime { get; set; }
+
+        public Guid? BusdriverId { get; set; }
+        public Busdriver? Busdriver { get; set; }
     }
 }

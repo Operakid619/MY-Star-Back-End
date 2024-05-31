@@ -12,6 +12,13 @@ namespace Infrastructure.Identity
         public virtual DateTime Created { get; protected set; }
         public virtual DateTime? Modified { get; protected set; }
         public virtual string? LastModifiedBy { get; protected set; }
+
+
+        /// <summary>
+        /// This contains the TenantKey MultiTenant
+        /// </summary>
+        //public string TenantKey { get; set; }
+
         protected BaseIdentity()
         {
             IsDeleted = false;

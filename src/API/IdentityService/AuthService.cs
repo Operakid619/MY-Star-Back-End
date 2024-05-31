@@ -112,7 +112,8 @@ namespace Core.Services
             response.Data.PhotoUrl = user.PhotoUrl;
             response.Data.Roles = userRoles;
 
-            var tokenResult = _tokenService.GetToken(new PersonaResponse() { UserName = user.UserName, Email = user.Email, FirstName = user.FirstName, Id = user.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, Roles = userRoles, });
+            //var tokenResult = _tokenService.GetToken(new PersonaResponse() { TenantKey = user.TenantKey, UserName = user.UserName, Email = user.Email, FirstName = user.FirstName, Id = user.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, Roles = userRoles, });
+            var tokenResult = _tokenService.GetToken(new PersonaResponse() {  UserName = user.UserName, Email = user.Email, FirstName = user.FirstName, Id = user.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, Roles = userRoles, });
             response.Data.Token = tokenResult.Token;
             response.Message = "Login Successfully!";
             response.Data.TokenExpiryDate = tokenResult.ExpiryDate;

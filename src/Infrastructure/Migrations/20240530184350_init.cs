@@ -72,6 +72,7 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Number = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    NumberOfSeat = table.Column<int>(type: "integer", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DeletedBy = table.Column<string>(type: "text", nullable: true),
                     Deleted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -172,6 +173,53 @@ namespace Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Parents", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tenants",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedBy = table.Column<string>(type: "text", nullable: true),
+                    Deleted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Modified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    TenantAdminEmail = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tenants", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Trips",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    BusDriver = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    FuelCousumption = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    IsReFuel = table.Column<bool>(type: "boolean", nullable: false),
+                    ReasonForReFuel = table.Column<string>(type: "text", nullable: true),
+                    RouteFollowed = table.Column<string>(type: "text", nullable: true),
+                    LastMaintenanceDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    TripType = table.Column<int>(type: "integer", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedBy = table.Column<string>(type: "text", nullable: true),
+                    Deleted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Modified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Trips", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -465,15 +513,18 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    StudentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserEmail = table.Column<string>(type: "text", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uuid", nullable: true),
                     InSchool = table.Column<bool>(type: "boolean", nullable: false),
                     PickUpTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DropOffTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     AuthorizedUser = table.Column<int>(type: "integer", nullable: false),
                     AuthorizedUserRelationship = table.Column<string>(type: "text", nullable: true),
-                    AuthorizedUserFirstName = table.Column<string>(type: "text", nullable: true),
-                    AuthorizedUserLastName = table.Column<string>(type: "text", nullable: true),
+                    AuthorizedUserFullName = table.Column<string>(type: "text", nullable: true),
+                    AuthorizedUserPhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    ScannedBy = table.Column<string>(type: "text", nullable: true),
+                    ScannedTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    BusdriverId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DeletedBy = table.Column<string>(type: "text", nullable: true),
                     Deleted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -486,9 +537,46 @@ namespace Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_QrCodes", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_QrCodes_Busdrivers_BusdriverId",
+                        column: x => x.BusdriverId,
+                        principalTable: "Busdrivers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_QrCodes_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TripStudents",
+                columns: table => new
+                {
+                    TripId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EnrollmentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedBy = table.Column<string>(type: "text", nullable: true),
+                    Deleted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Modified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TripStudents", x => new { x.TripId, x.StudentId });
+                    table.ForeignKey(
+                        name: "FK_TripStudents_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TripStudents_Trips_TripId",
+                        column: x => x.TripId,
+                        principalTable: "Trips",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -596,6 +684,11 @@ namespace Infrastructure.Migrations
                 column: "IsDeleted");
 
             migrationBuilder.CreateIndex(
+                name: "IX_QrCodes_BusdriverId",
+                table: "QrCodes",
+                column: "BusdriverId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_QrCodes_IsDeleted",
                 table: "QrCodes",
                 column: "IsDeleted");
@@ -634,6 +727,21 @@ namespace Infrastructure.Migrations
                 name: "IX_Students_IsDeleted",
                 table: "Students",
                 column: "IsDeleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TripStudents_IsDeleted",
+                table: "TripStudents",
+                column: "IsDeleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TripStudents_StudentId",
+                table: "TripStudents",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Trips_IsDeleted",
+                table: "Trips",
+                column: "IsDeleted");
         }
 
         /// <inheritdoc />
@@ -655,9 +763,6 @@ namespace Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Busdrivers");
-
-            migrationBuilder.DropTable(
                 name: "ParentStudent");
 
             migrationBuilder.DropTable(
@@ -665,6 +770,12 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Staffs");
+
+            migrationBuilder.DropTable(
+                name: "Tenants");
+
+            migrationBuilder.DropTable(
+                name: "TripStudents");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -676,13 +787,19 @@ namespace Infrastructure.Migrations
                 name: "Parents");
 
             migrationBuilder.DropTable(
-                name: "Students");
+                name: "Busdrivers");
 
             migrationBuilder.DropTable(
                 name: "Departments");
 
             migrationBuilder.DropTable(
                 name: "JobTitles");
+
+            migrationBuilder.DropTable(
+                name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "Trips");
 
             migrationBuilder.DropTable(
                 name: "Buses");

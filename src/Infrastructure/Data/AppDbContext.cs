@@ -30,6 +30,7 @@ namespace Infrastructure.Data
         public DbSet<QrCode> QrCodes { get; set; }
         public DbSet<Trip> Trips { get; set; }
         public DbSet<TripStudent> TripStudents { get; set; }
+        public DbSet<Tenant> Tenants { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

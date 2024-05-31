@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.Entities
 {
-    public class BaseEntity : IBaseEntity
+    public class Tenant
     {
         public Guid Id { get; set; }
         public bool IsDeleted { get; set; }
@@ -18,22 +18,14 @@ namespace Core.Entities
         public virtual string? LastModifiedBy { get; set; }
 
 
-        /// <summary>
-        /// This contains the TenantKey MultiTenant
-        /// </summary>
-        //public string? TenantKey { get; set; }
 
-        protected BaseEntity()
+        public string Name { get; set; }
+        public string TenantAdminEmail { get; set; }
+        public Tenant()
         {
-            Id = Guid.NewGuid();
             IsDeleted = false;
             Created = DateTime.UtcNow;
         }
 
-
-        public object Clone()
-        {
-            return MemberwiseClone();
-        }
     }
 }

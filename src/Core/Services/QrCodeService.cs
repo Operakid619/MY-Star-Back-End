@@ -8,19 +8,22 @@ using Models.Responses;
 using Shared.Models.Requests;
 using Shared.Models.Responses;
 using static Shared.Constants.StringConstants;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Core.Services
 {
     public class QrCodeService : IQrCodeService
     {
+        private readonly ILogger<QrCodeService> _logger;
         private readonly IQrCodeRepository _qrCodeRepository;
         private readonly ITripRepository _tripRepository;
         private readonly ITripService _tripService;
-        private readonly ILogger<QrCodeService> _logger;
         private readonly IStudentRepository _studentRepository;
         private readonly IParentRepository _parentRepository;
+        private readonly IBusDriverRepository _busDriverRepository;
         public QrCodeService(IQrCodeRepository qrCodeRepository, ITripRepository tripRepository, ITripService tripService,
-            ILogger<QrCodeService> logger, IStudentRepository studentRepository, IParentRepository parentRepository)
+            ILogger<QrCodeService> logger, IStudentRepository studentRepository, IParentRepository parentRepository,
+            IBusDriverRepository busDriverRepository)
         {
             _qrCodeRepository = qrCodeRepository;
             _tripRepository = tripRepository;
@@ -28,6 +31,7 @@ namespace Core.Services
             _logger = logger;
             _studentRepository = studentRepository;
             _parentRepository = parentRepository;
+            _busDriverRepository = busDriverRepository;
         }
 
         public async Task<ApiResponse<List<StudentInSchoolResponse>>> GetTodaysQrCodeAsync(string email)
@@ -54,7 +58,7 @@ namespace Core.Services
         {
             var response = new ApiResponse<GenerateQrCodeResponse>();
 
-            var qrCodeExist = await _qrCodeRepository.QrCodeExist(request.StudentId, request.UserEmail);
+            var qrCodeExist = await _qrCodeRepository.QrCodeExistForStudent(request.StudentId, request.UserEmail);
             if (qrCodeExist.Status)
             {
                 response.Status = qrCodeExist.Status;
@@ -200,7 +204,69 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<ScanQrCodeResponse>> ScanQrCodeAsync(string qrCodeData, string user)
+        public async Task<ApiResponse<GenerateQrCodeResponse>> GenerateQrCodeForTripAsync(Guid tripId, string busDriverEmail)
+        {
+            ApiResponse<GenerateQrCodeResponse> response = new ();
+            GenerateQrCodeResponse qrCodesResponse = new();
+
+
+            var busdriver = await _busDriverRepository.GetBusdriverByEmail(busDriverEmail);
+            if (busdriver is null)
+            {
+                response.Status = false;
+                response.Message = "Bus driver not found";
+                response.Code = ResponseCodes.Status404NotFound;
+                return response;
+            }
+
+
+            //check if busDriver has already generate qrcode for the day before proceding
+            //var qrCodeExist = await _qrCodeRepository.QrCodeExistForBusDriver(busdriver.Id);
+            //if (qrCodeExist.Status)
+            //{
+            //    response.Status = qrCodeExist.Status;
+            //    response.Message = qrCodeExist.Message;
+            //    response.Code = ResponseCodes.Status400BadRequest;
+            //    return response;
+            //}
+
+
+            //generate or create qrcode for bus driver
+            var newQrCode = new QrCode()
+            {
+                Id = Guid.NewGuid(),
+                BusdriverId = busdriver.Id, // busdriverId instead of student- it should be busdriver or student
+                UserEmail = busDriverEmail,
+                Created = DateTime.UtcNow,
+            };
+
+
+            var result = await _qrCodeRepository.AddQrCode(newQrCode);
+            if (!result.Status)
+            {
+                _logger.LogInformation("{0}", result.Message);
+                response.Status = result.Status;
+                response.Message = result.Message;
+                response.Code = result.Code;
+                return response;
+            }
+
+
+            qrCodesResponse = new()
+            {
+                QrCodeId = newQrCode.Id,
+                QrCodeData = $"mystar:{newQrCode.Id}"
+                //QrCodeData = $"mystar_{newQrCode.UserEmail}_{newQrCode.StudentId}_{newQrCode.Created}"
+            };
+
+
+            response.Data = qrCodesResponse;
+            return response;
+        }
+
+        //public async Task<ApiResponse<ScanQrCodeResponse>> ScanQrCodeAsync(string qrCodeData, string user)
+        //public async Task<object> ScanQrCodeAsync(string qrCodeData, string user)
+        public async Task<ApiResponse<ScanQrCodeResponse>> ScanQrCodeForStudentAsync(string qrCodeData, string user)
         {
             var response = new ApiResponse<ScanQrCodeResponse>();
 
@@ -243,7 +309,7 @@ namespace Core.Services
                 return response;
             }
 
-            var student = await _studentRepository.GetByIdAsync(qrCode.StudentId);
+            var student = await _studentRepository.GetByIdAsync(qrCode.StudentId.Value);
             if (student is null)
             {
                 //do something
@@ -274,8 +340,113 @@ namespace Core.Services
                 response.Data.AuthorizedUser = parent.FullName;
             }
 
-            return response;
 
+            //Check whether it a student qrcode or bus driver
+            //if (qrCode.StudentId is not null)
+            //{
+
+            //}
+            //else
+            //{
+            //    var busdriver = await _busDriverRepository.GetBusdriverById(qrCode.BusdriverId.Value);
+            //    if (busdriver is null)
+            //    {
+            //        //do something
+            //        response.Status = false;
+            //        response.Code = ResponseCodes.Status404NotFound;
+            //        response.Message = "Bus driver not found";
+            //        return response;
+            //    }
+
+
+            //    return new ApiResponse<ScanQrCodeBusDriverResponse>()
+            //    {
+            //        Data = new ScanQrCodeBusDriverResponse 
+            //        {
+            //            Email = busdriver.Email,
+            //            Photo = busdriver.PhotoUrl,
+            //            FullName = busdriver.FullName,
+            //            InTimer = qrCode.PickUpTime,
+            //            OutTimer = qrCode.DropOffTime,
+            //            PhoneNumber = busdriver.PhoneNumber,
+            //            BusNumber = busdriver.Bus.Number,
+            //        }
+            //    };
+
+            //}
+
+            return response;
         }
+
+
+        public async Task<ApiResponse<ScanQrCodeBusDriverResponse>> ScanQrCodeForBusDriverAsync(string qrCodeData, string user)
+        {
+            var response = new ApiResponse<ScanQrCodeBusDriverResponse>();
+
+            string[] parts = qrCodeData.Split(':');
+
+            if (!(parts.Length == 2 && Guid.TryParse(parts[1], out Guid qrCodeId)))
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status400BadRequest;
+                response.Message = "Invalid QrCode data";
+                return response;
+            }
+
+            var qrCode = await _qrCodeRepository.GetQrCodeById(qrCodeId);
+            if (qrCode is null)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Message = "QrCode doesn't exist";
+                return response;
+            }
+
+            if (qrCode.ScannedBy != null)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status400BadRequest;
+                response.Message = "QrCode has already been scanned";
+                return response;
+            }
+
+            qrCode.ScannedBy = user;
+            qrCode.ScannedTime = DateTime.UtcNow;
+
+            var result = await _qrCodeRepository.EditQrCode(qrCode);
+            if (!result.Status)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Message = result.Message;
+                return response;
+            }
+
+
+            var busdriver = await _busDriverRepository.GetBusdriverById(qrCode.BusdriverId.Value);
+            if (busdriver is null)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Message = "Bus driver not found";
+                return response;
+            }
+
+
+            response.Data = new ScanQrCodeBusDriverResponse
+            {
+                Email = busdriver.Email,
+                Photo = busdriver.PhotoUrl,
+                FullName = busdriver.FullName,
+                InTimer = qrCode.PickUpTime,
+                OutTimer = qrCode.DropOffTime,
+                PhoneNumber = busdriver.PhoneNumber,
+                BusNumber = busdriver.Bus.Number,
+                DateCreated = qrCode.Created
+            };
+
+            return response;
+        }
+
     }
 }

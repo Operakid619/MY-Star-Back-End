@@ -25,6 +25,7 @@ namespace API.SeedDatabase
                     UserName = superAdminEmail,
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
+                    //TenantKey = " "
                 };
                 var result = await userManager.CreateAsync(superAdmin, Environment.GetEnvironmentVariable("ROOT_DEFAULT_PASS") ?? DefaultValues.ROOT_DEFAULT_PASS);
                 if (result.Succeeded)
@@ -46,6 +47,7 @@ namespace API.SeedDatabase
                     UserName = SMSAdmin,
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
+                    //TenantKey = " "
                 };
                 var result = await userManager.CreateAsync(admin, Environment.GetEnvironmentVariable("SMS_ADMIN_PASSWORD") ?? DefaultValues.SMS_ADMIN_PASSWORD);
                 if (result.Succeeded)

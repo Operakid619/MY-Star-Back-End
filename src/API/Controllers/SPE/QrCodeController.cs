@@ -80,9 +80,9 @@ namespace API.Controllers.SPE
 
         [Authorize(Roles = AuthConstants.Roles.STAFF + ", " + AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
         [SwaggerOperation(
-        Summary = "Scan QrCode Endpoint",
-        Description = "This endpoint scans a qrCode. It requires Staff or Admin privilege",
-        OperationId = "qrCode.scan",
+        Summary = "Scan QrCode Of A Student Endpoint",
+        Description = "This endpoint scans a qrCode of a student. It requires Staff or Admin privilege",
+        OperationId = "qrCodeStudent.scan",
         Tags = new[] { "QrCodeEndpoints" })
         ]
         [Produces(MediaTypeNames.Application.Json)]
@@ -92,10 +92,31 @@ namespace API.Controllers.SPE
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        [HttpPut("scan-qrcode")]
-        public async Task<ActionResult<ApiResponse<ScanQrCodeResponse>>> ScanQrCodeAsync(string qrCodeData)
+        [HttpPut("scan-qrcode-student")]
+        public async Task<ActionResult<ApiResponse<ScanQrCodeResponse>>> ScanQrCodeForStudentAsync(string qrCodeData)
         {
-            var response = await _qrCodeService.ScanQrCodeAsync(qrCodeData, User.Identity!.Name ?? string.Empty);
+            var response = await _qrCodeService.ScanQrCodeForStudentAsync(qrCodeData, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
+
+        [Authorize(Roles = AuthConstants.Roles.STAFF + ", " + AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        [SwaggerOperation(
+        Summary = "Scan QrCode Of A BusDriver Endpoint",
+        Description = "This endpoint scans a qrCode of a busdriver. It requires Staff or Admin privilege",
+        OperationId = "qrCodeBusddriver.scan",
+        Tags = new[] { "QrCodeEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<ScanQrCodeBusDriverResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPut("scan-qrcode-busdriver")]
+        public async Task<ActionResult<ApiResponse<ScanQrCodeBusDriverResponse>>> ScanQrCodeForDriverAsync(string qrCodeData)
+        {
+            var response = await _qrCodeService.ScanQrCodeForBusDriverAsync(qrCodeData, User.Identity!.Name ?? string.Empty);
             return HandleResult(response);
         }
 
@@ -247,24 +268,45 @@ namespace API.Controllers.SPE
         }
 
 
+        //[Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        //[SwaggerOperation(
+        //    Summary = "Generates QrCodes for student onboarded on a trip Endpoint",
+        //    Description = "It requires Bus Driver privilege",
+        //    OperationId = "qrCodesTrip.generate",
+        //    Tags = new[] { "QrCodeEndpoints" })
+        //]
+        //[Produces(MediaTypeNames.Application.Json)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ApiResponse<List<GenerateQrCodeResponse>>), StatusCodes.Status201Created)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        //[HttpPost("trip/generate-qrCodes/{tripId}/")]
+        //public async Task<ActionResult<ApiResponse<List<GenerateQrCodeResponse>>>> GenerateQrCodesForTrip([FromRoute] Guid tripId)
+        //{
+        //    var response = await _qrCodeService.GenerateQrCodesForTripAsync(tripId, User.Identity!.Name ?? string.Empty);
+        //    return HandleResult(response);
+        //}
+        
         [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
         [SwaggerOperation(
-            Summary = "Generates QrCodes for student onboarded on a trip Endpoint",
+            Summary = "Generate QrCode For Bus driver For A Trip Endpoint",
             Description = "It requires Bus Driver privilege",
-            OperationId = "qrCodesTrip.generate",
+            OperationId = "qrCodeTrip.generate",
             Tags = new[] { "QrCodeEndpoints" })
         ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<List<GenerateQrCodeResponse>>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<GenerateQrCodeResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        [HttpPost("trip/generate-qrCodes/{tripId}/")]
-        public async Task<ActionResult<ApiResponse<List<GenerateQrCodeResponse>>>> GenerateQrCodesForTrip([FromRoute] Guid tripId)
+        [HttpPost("trip/generate-qrCode/{tripId}/")]
+        public async Task<ActionResult<ApiResponse<GenerateQrCodeResponse>>> GenerateQrCodeForTrip([FromRoute] Guid tripId)
         {
-            var response = await _qrCodeService.GenerateQrCodesForTripAsync(tripId, User.Identity!.Name ?? string.Empty);
+            var response = await _qrCodeService.GenerateQrCodeForTripAsync(tripId, User.Identity!.Name ?? string.Empty);
             return HandleResult(response);
         }
     }

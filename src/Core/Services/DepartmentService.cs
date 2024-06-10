@@ -4,14 +4,13 @@ using Core.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Models.Requests;
 using Models.Responses;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
 
 namespace Core.Services
 {
     public class DepartmentService : IDepartmentService
     {
-        private readonly AppDbContext _context;
-
         private readonly IDepartmentRepository _departmentRepository;
         public DepartmentService(IDepartmentRepository departmentRepository)
         {
@@ -43,6 +42,11 @@ namespace Core.Services
                     DeparmentName = x.Name
                 }).ToListAsync()
             };
+        }
+
+        public Task<BaseResponse> UpdateDepartmentAsync(UpdateDepartmentRequest request)
+        {
+            throw new NotImplementedException();
         }
     }
 }

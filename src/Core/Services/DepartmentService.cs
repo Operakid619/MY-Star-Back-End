@@ -10,6 +10,8 @@ namespace Core.Services
 {
     public class DepartmentService : IDepartmentService
     {
+        private readonly AppDbContext _context;
+
         private readonly IDepartmentRepository _departmentRepository;
         public DepartmentService(IDepartmentRepository departmentRepository)
         {

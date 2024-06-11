@@ -1,11 +1,14 @@
 ﻿using Core.Interfaces.Services;
+using Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Models.Requests;
 using Models.Responses;
 using Shared.Constants;
 using Shared.Controllers;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
@@ -20,13 +23,14 @@ namespace API.Controllers.SPE
     public class ConfigSPEController(IGradeService gradeService, ICampusService campusService,
         IJobTitleService jobTitleService,
         IBusService busService,
-        IDepartmentService departmentService) : BaseController
+        IDepartmentService departmentService, AppDbContext context) : BaseController
     {
         private readonly IGradeService _gradeService = gradeService;
         private readonly ICampusService _campusService = campusService;
         private readonly IJobTitleService _jobTitleService = jobTitleService;
         private readonly IBusService _busService = busService;
         private readonly IDepartmentService _departmentService = departmentService;
+        private readonly AppDbContext _appDbContext = context;
 
         [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
@@ -268,6 +272,41 @@ namespace API.Controllers.SPE
         {
             var response = await _departmentService.GetAllAsync();
             return HandleResult(response);
+        }
+
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
+        [SwaggerOperation(
+            Summary = "Update Department Endpoint",
+            Description = "This endpoint updates an existing department. It requires Admin privilege",
+            OperationId = "department.update",
+            Tags = new[] { "SPE-Configuration-Endpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPut("update-department")]
+        public async Task<ActionResult<BaseResponse>> UpdateDepartmentAsync(UpdateDepartmentRequest request)
+        {
+
+            var department = await _appDbContext.Departments.FindAsync(request.Id);
+            if (department == null)
+            {
+                return HandleResult(new BaseResponse { Status = false, Message = "Department not found" });
+            }
+
+            department.Name = request.Name;
+            _appDbContext.Departments.Update(department);
+            await _appDbContext.SaveChangesAsync();
+
+            return HandleResult(new BaseResponse { Status = true, Message = "Department updated successfully" });
+
+
+            //var response = await _departmentService.UpdateDepartmentAsync(request);
+            //return HandleResult(response);
         }
 
     }
